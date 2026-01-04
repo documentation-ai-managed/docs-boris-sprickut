@@ -1,0 +1,160 @@
+---
+title: Integrations and Extensions
+description: Connect Boris Sprickut with third-party tools to enhance your documentation workflow and team productivity.
+---
+
+## Overview
+
+Boris Sprickut integrates seamlessly with popular tools to streamline your documentation processes. Sync changes with GitHub for version control, receive real-time Slack notifications, export content to PDF or Markdown, and build custom solutions using the REST API. These integrations help you collaborate efficiently and automate workflows.
+
+<Callout kind="info">
+  Enable integrations in your dashboard at `https://dashboard.example.com/settings/integrations`.
+</Callout>
+
+## Key Integrations
+
+<Columns cols={2}>
+  <Card title="GitHub Sync" icon="github" href="#github-sync">
+    Automatically sync documentation updates with your GitHub repository.
+  </Card>
+  <Card title="Slack Notifications" icon="message-circle" href="#slack-notifications">
+    Get instant alerts for doc changes, approvals, and reviews.
+  </Card>
+  <Card title="Export Tools" icon="download" href="#exports">
+    Generate PDF or Markdown files for sharing or archiving.
+  </Card>
+  <Card title="REST API" icon="api" href="#api-integrations">
+    Programmatic access for custom automation and apps.
+  </Card>
+</Columns>
+
+## GitHub Sync
+
+Connect Boris Sprickut to GitHub to push documentation changes as commits or pull requests. This keeps your repo in sync with live docs.
+
+<Steps>
+  <Step title="Create Webhook" icon="settings">
+    In GitHub repo settings, add a webhook pointing to `https://api.example.com/v1/webhooks/github`.
+
+    <ParamField header="X-GitHub-Event" param-type="string" required="true">
+      Event type like `push` or `pull_request`.
+    </ParamField>
+  </Step>
+  <Step title="Configure Boris Sprickut" icon="link">
+    In your dashboard, enter the GitHub repo URL and webhook secret.
+  </Step>
+  <Step title="Test Sync" icon="play">
+    Make a doc change and verify the GitHub commit appears.
+  </Step>
+</Steps>
+
+<CodeGroup tabs="JavaScript,cURL">
+  ```javascript
+  const response = await fetch('https://api.example.com/v1/repos/sync', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${YOUR_API_KEY}` },
+    body: JSON.stringify({ repo: 'your-org/your-repo', branch: 'main' })
+  });
+  ```
+  ```bash
+  curl -X POST https://api.example.com/v1/repos/sync \
+    -H "Authorization: Bearer YOUR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"repo":"your-org/your-repo","branch":"main"}'
+  ```
+</CodeGroup>
+
+## Slack Notifications
+
+Set up Slack to receive notifications for doc events like publishes or comments.
+
+<Tabs>
+  <Tab title="Incoming Webhook" icon="plug">
+    Create a Slack app and get your webhook URL.
+
+    <CodeGroup tabs="JavaScript,Python">
+      ```javascript
+      await fetch('https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK', {
+        method: 'POST',
+        body: JSON.stringify({
+          text: 'New doc published: https://docs.example.com/my-page'
+        })
+      });
+      ```
+      ```python
+      import requests
+      requests.post('https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK', {
+          'text': 'New doc published: https://docs.example.com/my-page'
+      })
+      ```
+    </CodeGroup>
+  </Tab>
+  <Tab title="Boris Sprickut Setup" icon="settings">
+    Paste your Slack webhook into dashboard settings.
+
+    <Request tabs="cURL" show-lines="true">
+      ```bash
+      curl -X POST https://api.example.com/v1/notifications/slack \
+        -H "Authorization: Bearer YOUR_API_KEY" \
+        -d '{"webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK", "events": ["publish", "comment"]}'
+      ```
+    </Request>
+  </Tab>
+</Tabs>
+
+<Callout kind="tip">
+  Filter notifications by workspace or doc collection to reduce noise.
+</Callout>
+
+## Export Options
+
+Export your documentation for offline use or external sharing.
+
+<Tabs>
+  <Tab title="PDF Export" icon="file-text">
+    <Response tabs="200">
+      ```json
+      {
+        "id": "exp_123abc",
+        "status": "completed",
+        "url": "https://api.example.com/v1/exports/exp_123abc.pdf",
+        "pages": 42
+      }
+      ```
+    </Response>
+  </Tab>
+  <Tab title="Markdown Export" icon="file">
+    Trigger via API for full site or single pages.
+  </Tab>
+</Tabs>
+
+## Custom API Integrations
+
+Build advanced automations using the Boris Sprickut REST API.
+
+<ParamField path="doc_id" param-type="string" required="true">
+  Unique document identifier.
+</ParamField>
+
+<ParamField query="format" param-type="string" required="false">
+  Export format: `pdf` or `markdown`.
+</ParamField>
+
+<Request tabs="JavaScript">
+  ```javascript
+  const exportDoc = await fetch(`https://api.example.com/v1/docs/${docId}/export?format=pdf`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${YOUR_API_KEY}` }
+  });
+  ```
+</Request>
+
+<Expandable title="Advanced API Authentication" default-open="false">
+  Use OAuth 2.0 for app integrations.
+
+  ```javascript
+  const token = await exchangeCodeForToken('auth_code');
+  ```
+</Expandable>
+
+These integrations supercharge your workflow. Start with GitHub sync for immediate value, then explore API for custom needs.
